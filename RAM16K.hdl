@@ -1,0 +1,17 @@
+CHIP RAM16k {
+    IN in[16], load, address[14];
+    OUT out[16];
+
+    PARTS:
+    // Split the load signal among 4 RAM4K components
+    DMux4Way(in=load, sel=address[12..13], a=a, b=b, c=c, d=d);
+
+    // Each RAM4K gets a 12-bit address and load signal
+    RAM4K(in=in, load=a, address=address[0..11], out=aOut);
+    RAM4K(in=in, load=b, address=address[0..11], out=bOut);
+    RAM4K(in=in, load=c, address=address[0..11], out=cOut);
+    RAM4K(in=in, load=d, address=address[0..11], out=dOut);
+
+    // Use Mux4Way16 to combine the outputs of the RAM4K components
+    Mux4Way16(a=aOut, b=bOut, c=cOut, d=dOut, sel=address[12..13], out=out);
+}
